@@ -1,0 +1,764 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse Gigs - TazaMall{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --secondary: #5461f3;
+        --dark: #0f172a;
+        --gray: #64748b;
+        --light: #f8fafc;
+        --border: #e2e8f0;
+        --success: #10b981;
+    }
+
+    body {
+        background: #f8fafc;
+    }
+
+    .hero-section {
+        position: relative;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at top left, rgba(99,102,241,0.35), transparent 35%),
+            radial-gradient(circle at top right, rgba(139,92,246,0.35), transparent 35%),
+            linear-gradient(135deg, #0f172a 0%, #1e1b4b 45%, #312e81 100%);
+        padding: 90px 0 80px;
+        margin-bottom: 40px;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+        background-size: 24px 24px;
+        opacity: 0.4;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        max-width: 850px;
+        margin: auto;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.12);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: #e0e7ff;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 22px;
+    }
+
+    .hero-title {
+        color: white;
+        font-size: clamp(2.4rem, 5vw, 4.5rem);
+        font-weight: 900;
+        line-height: 1.05;
+        margin-bottom: 20px;
+        letter-spacing: -2px;
+    }
+
+    .hero-subtitle {
+        color: rgba(255,255,255,0.75);
+        font-size: 18px;
+        line-height: 1.8;
+        max-width: 720px;
+        margin: auto;
+    }
+
+    .search-wrapper {
+        margin-top: 36px;
+        position: relative;
+    }
+
+    .search-box {
+        position: relative;
+        max-width: 760px;
+        margin: auto;
+    }
+
+    .search-box input {
+        width: 100%;
+        height: 72px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.96);
+        padding: 0 190px 0 72px;
+        font-size: 17px;
+        font-weight: 500;
+        outline: none;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        transition: all 0.25s ease;
+    }
+
+    .search-box input:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 28px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 20px;
+    }
+
+    .search-btn {
+        position: absolute;
+        right: 8px;
+        top: 8px;
+        bottom: 8px;
+        border: none;
+        border-radius: 999px;
+        padding: 0 32px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .search-btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 12px 35px rgba(99,102,241,0.4);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+    }
+
+    .section-title {
+        font-size: 30px;
+        font-weight: 800;
+        color: var(--dark);
+        letter-spacing: -1px;
+    }
+
+    .section-subtitle {
+        color: var(--gray);
+        margin-top: 6px;
+        font-size: 15px;
+    }
+
+    .category-wrapper {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        margin-bottom: 34px;
+        scrollbar-width: none;
+    }
+
+    .category-wrapper::-webkit-scrollbar {
+        display: none;
+    }
+
+    .cat-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 22px;
+        border-radius: 999px;
+        text-decoration: none;
+        background: white;
+        border: 1px solid var(--border);
+        color: #334155;
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+
+    .cat-pill:hover,
+    .cat-pill.active {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        border-color: transparent;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(99,102,241,0.25);
+    }
+
+    .gigs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 26px;
+    }
+
+    .gig-card {
+        position: relative;
+        background: rgba(255,255,255,0.88);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.6);
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(15,23,42,0.06);
+    }
+
+    .gig-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 25px 60px rgba(15,23,42,0.12);
+    }
+
+    .gig-image-wrap {
+        position: relative;
+        aspect-ratio: 16/10;
+        overflow: hidden;
+        background: linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%);
+    }
+
+    .gig-image-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.45s ease;
+    }
+
+    .gig-card:hover .gig-image-wrap img {
+        transform: scale(1.08);
+    }
+
+    {% comment %} .featured-tag {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        background: rgba(255,255,255,0.92);
+        backdrop-filter: blur(12px);
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--primary-dark);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    } {% endcomment %}
+
+    .gig-content {
+        padding: 18px;
+    }
+
+    .seller-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .seller-avatar,
+    .seller-avatar-placeholder {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .seller-avatar {
+        object-fit: cover;
+        border: 3px solid #eef2ff;
+    }
+
+    .seller-avatar-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .seller-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .seller-level {
+        margin-top: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #eef2ff;
+        color: var(--primary-dark);
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .gig-title {
+        margin-bottom: 14px;
+    }
+
+    .gig-title a {
+        color: var(--dark);
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.2s ease;
+    }
+
+    .gig-title a:hover {
+        color: var(--primary-dark);
+    }
+
+    .rating-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 18px;
+    }
+
+    .stars {
+        color: #f59e0b;
+        font-size: 13px;
+    }
+
+    .rating-number {
+        font-size: 13px;
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .reviews-count {
+        font-size: 12px;
+        color: #94a3b8;
+    }
+
+    .gig-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        padding-top: 18px;
+        border-top: 1px solid #eef2ff;
+    }
+
+    .price-block small {
+        display: block;
+        color: #94a3b8;
+        font-size: 11px;
+        margin-bottom: 4px;
+    }
+
+    .gig-price {
+        font-size: 24px;
+        font-weight: 900;
+        color: var(--dark);
+        line-height: 1;
+    }
+
+    .delivery {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 6px;
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .view-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        text-decoration: none;
+        padding: 13px 20px;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 700;
+        transition: all 0.25s ease;
+        box-shadow: 0 10px 25px rgba(99,102,241,0.22);
+    }
+
+    .view-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 35px rgba(99,102,241,0.32);
+    }
+
+    .pagination-wrap {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 60px;
+        flex-wrap: wrap;
+    }
+
+    .pagination-wrap a,
+    .pagination-wrap span {
+        min-width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        transition: all 0.2s ease;
+    }
+
+    .pagination-wrap a {
+        background: white;
+        color: #334155;
+        border: 1px solid var(--border);
+    }
+
+    .pagination-wrap a:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .pagination-wrap span {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        box-shadow: 0 10px 25px rgba(99,102,241,0.22);
+    }
+
+    .empty-state {
+        text-align: center;
+        background: white;
+        padding: 80px 30px;
+        border-radius: 30px;
+        border: 1px solid var(--border);
+    }
+
+    .empty-icon {
+        width: 110px;
+        height: 110px;
+        margin: 0 auto 24px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 44px;
+        color: var(--primary);
+    }
+
+    .empty-state h3 {
+        font-size: 30px;
+        font-weight: 900;
+        color: var(--dark);
+        margin-bottom: 10px;
+    }
+
+    .empty-state p {
+        color: var(--gray);
+        margin-bottom: 28px;
+        font-size: 16px;
+    }
+
+    .clear-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 15px 28px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        text-decoration: none;
+        font-weight: 700;
+        box-shadow: 0 12px 30px rgba(99,102,241,0.25);
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 70px 0 60px;
+        }
+
+        .search-box input {
+            height: 62px;
+            padding: 0 20px 0 58px;
+            font-size: 15px;
+        }
+
+        .search-btn {
+            position: relative;
+            width: 100%;
+            margin-top: 12px;
+            height: 56px;
+        }
+
+        .gig-footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .view-btn {
+            width: 100%;
+        }
+
+        .section-header {
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="hero-section">
+    <div class="container mx-auto px-4">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-bolt"></i>
+                Premium Freelance Marketplace
+            </div>
+
+            <h1 class="hero-title">
+                Discover World-Class
+                <span style="background: linear-gradient(135deg,#a5b4fc,#ddd6fe); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+                    Freelance Talent
+                </span>
+            </h1>
+
+            <p class="hero-subtitle">
+                Explore premium services from talented freelancers worldwide.
+                Fast delivery, verified sellers, and exceptional quality.
+            </p>
+
+            <div class="search-wrapper">
+                <div class="search-box">
+                    <form method="get">
+                        <i class="fas fa-search search-icon"></i>
+                        <input
+                            type="text"
+                            name="q"
+                            value="{{ request.GET.q|default:'' }}"
+                            placeholder="Search web development, logo design, video editing..."
+                        >
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search mr-2"></i>
+                            Search Gigs
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mx-auto px-4 pb-20">
+
+    <div class="section-header">
+        <div>
+            <h2 class="section-title">Top Freelance Services</h2>
+            <p class="section-subtitle">
+                Browse premium services crafted by expert freelancers.
+            </p>
+        </div>
+    </div>
+
+    <div class="category-wrapper">
+        <a href="?{% if request.GET.q %}q={{ request.GET.q }}{% endif %}"
+           class="cat-pill {% if not request.GET.category %}active{% endif %}">
+            All Categories
+        </a>
+
+        {% for cat in categories %}
+        <a href="?category={{ cat.id }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+           class="cat-pill {% if request.GET.category == cat.id|stringformat:'s' %}active{% endif %}">
+            {{ cat.name }}
+        </a>
+        {% endfor %}
+    </div>
+
+    {% if gigs %}
+
+    <div class="gigs-grid">
+        {% for gig in gigs %}
+
+        <div class="gig-card">
+
+            <div class="gig-image-wrap">
+                {% if gig.featured_image %}
+                    <img src="{{ gig.featured_image.url }}" alt="{{ gig.title }}">
+                {% else %}
+                    <div class="flex items-center justify-center h-full">
+                        <i class="fas fa-image text-5xl text-indigo-300"></i>
+                    </div>
+                {% endif %}
+
+                <div class="featured-tag">
+                    <i class="fas fa-star"></i>
+                    Featured
+                </div>
+            </div>
+
+            <div class="gig-content">
+
+                <div class="seller-row">
+                    {% if gig.freelancer.avatar %}
+                        <img src="{{ gig.freelancer.avatar.url }}"
+                             alt="{{ gig.freelancer.username }}"
+                             class="seller-avatar">
+                    {% else %}
+                        <div class="seller-avatar-placeholder">
+                            {% if gig.freelancer.first_name %}
+                            {{ gig.freelancer.first_name|first|upper }}
+                        {% else %}
+                            {{ gig.freelancer.username|first|upper }}
+                        {% endif %}
+                                                </div>
+                    {% endif %}
+
+                    <div>
+                        <div class="seller-name">
+                            {% if gig.freelancer.first_name %}
+                                {{ gig.freelancer.first_name }}
+                            {% else %}
+                                {{ gig.freelancer.username|cut:"@gmail.com" }}
+                            {% endif %}
+                        </div>
+
+                        {% if gig.freelancer.level %}
+                        <div class="seller-level">
+                            <i class="fas fa-shield-alt"></i>
+                            Level {{ gig.freelancer.level }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="gig-title">
+                    <a href="{% url 'gigs:gig_detail' gig.slug %}">
+                        {{ gig.title }}
+                    </a>
+                </div>
+
+                <div class="rating-row">
+                    <div class="stars">
+                        {% with rating=gig.rating|default:0 %}
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= rating %}
+                                <i class="fas fa-star"></i>
+                            {% elif forloop.counter <= rating|add:"0.5" %}
+                                <i class="fas fa-star-half-alt"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                        {% endwith %}
+                    </div>
+
+                    <span class="rating-number">
+                        {{ gig.rating|default:"0.0"|floatformat:1 }}
+                    </span>
+
+                    <span class="reviews-count">
+                        ({{ gig.total_reviews|default:0 }} reviews)
+                    </span>
+                </div>
+
+                <div class="gig-footer">
+
+                    <div class="price-block">
+                        <small>Starting at</small>
+                        <div class="gig-price">
+                            ${{ gig.price|floatformat:2 }}
+                        </div>
+
+                        <div class="delivery">
+                            <i class="fas fa-clock"></i>
+                            {{ gig.delivery_days }} day{{ gig.delivery_days|pluralize }} delivery
+                        </div>
+                    </div>
+
+                    <a href="{% url 'gigs:gig_detail' gig.slug %}" class="view-btn">
+                        View Gig
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+
+        {% endfor %}
+    </div>
+
+    {% if gigs.has_other_pages %}
+    <div class="pagination-wrap">
+
+        {% if gigs.has_previous %}
+        <a href="?page={{ gigs.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        {% endif %}
+
+        {% for num in gigs.paginator.page_range %}
+            {% if gigs.number == num %}
+                <span>{{ num }}</span>
+            {% elif num > gigs.number|add:'-3' and num < gigs.number|add:'3' %}
+                <a href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                    {{ num }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if gigs.has_next %}
+        <a href="?page={{ gigs.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+        {% endif %}
+
+    </div>
+    {% endif %}
+
+    {% else %}
+
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-briefcase"></i>
+        </div>
+
+        <h3>No Gigs Found</h3>
+
+        <p>
+            We couldn't find any gigs matching your search.
+            Try different keywords or browse all categories.
+        </p>
+
+        <a href="{% url 'gigs:gig_list' %}" class="clear-btn">
+            <i class="fas fa-refresh"></i>
+            Clear Search
+        </a>
+    </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}
+

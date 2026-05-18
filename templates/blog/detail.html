@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} - TazaMall Research{% endblock %}
+
+{% block content %}
+<style>
+    .paper-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    .paper-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .paper-title {
+        font-size: 32px;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+    
+    .paper-authors {
+        font-size: 16px;
+        color: #4b5563;
+        margin-bottom: 10px;
+    }
+    
+    .paper-meta {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        font-size: 14px;
+        color: #6b7280;
+    }
+    
+    .abstract-box {
+        background: #f9fafb;
+        border-left: 4px solid #3b82f6;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 8px;
+    }
+    
+    .abstract-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #1f2937;
+    }
+    
+    .keywords-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .section {
+        margin-bottom: 35px;
+    }
+    
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #3b82f6;
+    }
+    
+    .section-content {
+        line-height: 1.8;
+        color: #374151;
+    }
+    
+    .reference-box {
+        background: #f9fafb;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 30px;
+    }
+    
+    .reference-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    
+    .reference-list li {
+        margin-bottom: 10px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .citation {
+        font-family: monospace;
+        font-size: 13px;
+        color: #6b7280;
+    }
+    
+    .sidebar-paper {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e5e7eb;
+        position: sticky;
+        top: 90px;
+    }
+    
+    .btn-download {
+        display: inline-block;
+        background: #3b82f6;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        margin-right: 10px;
+    }
+    
+    .btn-cite {
+        background: #f3f4f6;
+        color: #374151;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    @media (max-width: 768px) {
+        .paper-title {
+            font-size: 24px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+        }
+    }
+</style>
+
+<div class="paper-container">
+    <div class="paper-header">
+        <h1 class="paper-title">{{ post.title }}</h1>
+        <div class="paper-authors">{{ post.author.get_full_name|default:post.author.username }}</div>
+        <div class="paper-meta">
+            <span><i class="far fa-calendar"></i> Published: {{ post.published_at|date:"F d, Y" }}</span>
+            <span><i class="far fa-clock"></i> Reading time: {{ post.reading_time }} min</span>
+            <span><i class="far fa-eye"></i> Views: {{ post.views }}</span>
+            <span><i class="fas fa-tag"></i> DOI: 10.xxxx/tazamall.{{ post.id }}</span>
+        </div>
+    </div>
+    
+    <!-- Abstract -->
+    <div class="abstract-box">
+        <div class="abstract-title">Abstract</div>
+        <p>{{ post.abstract }}</p>
+    </div>
+    
+    <!-- Keywords -->
+    <div class="keywords-box">
+        <strong>Keywords:</strong>
+        {% for keyword in post.keywords.split %}
+        <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">{{ keyword }}</span>
+        {% endfor %}
+    </div>
+    
+    <!-- 1. Introduction -->
+    <div class="section">
+        <h2 class="section-title">1. Introduction</h2>
+        <div class="section-content">
+            {{ post.introduction|safe }}
+        </div>
+    </div>
+    
+    <!-- 2. Literature Review (if exists) -->
+    {% if post.literature_review %}
+    <div class="section">
+        <h2 class="section-title">2. Literature Review</h2>
+        <div class="section-content">
+            {{ post.literature_review|safe }}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- 3. Methodology (if exists) -->
+    {% if post.methodology %}
+    <div class="section">
+        <h2 class="section-title">3. Methodology</h2>
+        <div class="section-content">
+            {{ post.methodology|safe }}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- 4. Analysis -->
+    <div class="section">
+        <h2 class="section-title">4. Analysis & Discussion</h2>
+        <div class="section-content">
+            {{ post.analysis|safe }}
+        </div>
+    </div>
+    
+    <!-- 5. Findings (if exists) -->
+    {% if post.findings %}
+    <div class="section">
+        <h2 class="section-title">5. Findings</h2>
+        <div class="section-content">
+            {{ post.findings|safe }}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- 6. Conclusion -->
+    <div class="section">
+        <h2 class="section-title">6. Conclusion</h2>
+        <div class="section-content">
+            {{ post.conclusion|safe }}
+        </div>
+    </div>
+    
+    <!-- References -->
+    {% if post.references %}
+    <div class="reference-box">
+        <h3 class="font-bold text-lg mb-3">References</h3>
+        <div class="reference-content">
+            {{ post.references|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Citation -->
+    <div class="mt-6 text-center">
+        <p class="citation text-sm">
+            How to cite: {{ post.author.get_full_name|default:post.author.username }}. ({{ post.published_at|date:"Y" }}). 
+            {{ post.title }}. TazaMall Research, {{ post.published_at|date:"Volume" }}({{ post.published_at|date:"Issue" }}), 1-{{ post.reading_time }}.
+        </p>
+    </div>
+    
+    <!-- Comments Section -->
+    <div class="mt-12 pt-8 border-t">
+        <h3 class="text-xl font-bold mb-4">Discussion ({{ post.comments.count }})</h3>
+        
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'blog:add_comment' post.id %}" class="mb-8">
+            {% csrf_token %}
+            <textarea name="comment" rows="4" class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500" placeholder="Share your thoughts..."></textarea>
+            <button type="submit" class="mt-3 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Post Comment</button>
+        </form>
+        {% else %}
+        <p class="text-gray-500 mb-4"><a href="{% url 'login' %}" class="text-blue-600">Login</a> to join the discussion.</p>
+        {% endif %}
+        
+        {% for comment in post.comments.all %}
+        {% if comment.is_approved %}
+        <div class="bg-gray-50 rounded-lg p-4 mb-3">
+            <div class="flex justify-between items-start">
+                <div>
+                    <strong>{{ comment.user.get_full_name|default:comment.user.username }}</strong>
+                    <span class="text-xs text-gray-500 ml-2">{{ comment.created_at|date:"M d, Y" }}</span>
+                </div>
+            </div>
+            <p class="mt-2 text-gray-700">{{ comment.comment }}</p>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

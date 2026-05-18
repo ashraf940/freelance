@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Announcements - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container { max-width: 1000px; margin: 0 auto; padding: 30px 20px; }
+    .announcement-card { background: white; border-radius: 16px; border: 1px solid #e5e7eb; padding: 20px; margin-bottom: 20px; }
+    .form-card { background: white; border-radius: 16px; border: 1px solid #e5e7eb; padding: 20px; margin-bottom: 30px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; }
+    .btn-submit { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+    .btn-delete { color: #ef4444; text-decoration: none; float: right; }
+    .announcement-type { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .type-info { background: #dbeafe; color: #1e40af; }
+    .type-warning { background: #fef3c7; color: #92400e; }
+    .type-success { background: #d1fae5; color: #065f46; }
+    .type-danger { background: #fee2e2; color: #991b1b; }
+</style>
+
+<div class="admin-container">
+    <div class="admin-header"><h1>Announcements</h1><p>Create and manage platform announcements</p></div>
+
+    <div class="form-card">
+        <h3>Create New Announcement</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group"><label>Title</label><input type="text" name="title" required></div>
+            <div class="form-group"><label>Message</label><textarea name="message" rows="4" required></textarea></div>
+            <div class="form-group"><label>Type</label><select name="type"><option value="info">Info</option><option value="success">Success</option><option value="warning">Warning</option></select></div>
+            <button type="submit" class="btn-submit">Post Announcement</button>
+        </form>
+    </div>
+
+    <h3 style="margin-bottom: 15px;">Recent Announcements</h3>
+    {% for ann in announcements %}
+    <div class="announcement-card">
+        <!-- FIXED: Hardcoded URL instead of url tag -->
+        <a href="/admin-panel/announcements/{{ ann.id }}/delete/" class="btn-delete" onclick="return confirm('Delete this announcement?')">🗑️</a>
+        <span class="announcement-type type-{{ ann.announcement_type }}">{{ ann.announcement_type|title }}</span>
+        <h4 style="margin: 10px 0 5px;">{{ ann.title }}</h4>
+        <p>{{ ann.message }}</p>
+        <small style="color:#6b7280;">Posted by {{ ann.created_by.email }} on {{ ann.created_at|date:"M d, Y" }}</small>
+    </div>
+    {% empty %}
+    <p style="text-align:center;padding:50px;background:white;border-radius:16px;">No announcements yet</p>
+    {% endfor %}
+</div>
+{% endblock %}

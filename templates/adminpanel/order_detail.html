@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Details - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+    .order-card { background: white; border-radius: 20px; border: 1px solid #e5e7eb; padding: 25px; margin-bottom: 25px; }
+    .info-row { display: flex; padding: 10px 0; border-bottom: 1px solid #e5e7eb; }
+    .info-label { width: 150px; font-weight: 600; color: #6b7280; }
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .dispute-box { background: #fef3c7; padding: 20px; border-radius: 12px; margin-top: 20px; }
+    .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; }
+    .btn-refund { background: #ef4444; color: white; }
+    .btn-release { background: #10b981; color: white; }
+</style>
+
+<div class="admin-container">
+    <a href="{% url 'adminpanel:orders' %}" style="color:#3b82f6; text-decoration:none;">← Back to Orders</a>
+
+    <div class="order-card">
+        <h2>Order #{{ order.order_number }}</h2>
+        <p><span class="status-badge" style="background: {% if order.status == 'completed' %}#d1fae5{% elif order.status == 'active' %}#dbeafe{% elif order.status == 'pending' %}#fef3c7{% else %}#fee2e2{% endif %}">{{ order.status|title }}</span></p>
+
+        <div class="info-row"><div class="info-label">Gig:</div><div><a href="{% url 'gigs:gig_detail' order.gig.slug %}" target="_blank">{{ order.gig.title }}</a></div></div>
+        <div class="info-row"><div class="info-label">Buyer:</div><div>{{ order.buyer.email }}</div></div>
+        <div class="info-row"><div class="info-label">Seller:</div><div>{{ order.seller.email }}</div></div>
+        <div class="info-row"><div class="info-label">Amount:</div><div>${{ order.amount|floatformat:2 }}</div></div>
+        <div class="info-row"><div class="info-label">Service Fee:</div><div>${{ order.service_fee|floatformat:2 }}</div></div>
+        <div class="info-row"><div class="info-label">Total:</div><div><strong>${{ order.total_amount|floatformat:2 }}</strong></div></div>
+        <div class="info-row"><div class="info-label">Created:</div><div>{{ order.created_at|date:"M d, Y H:i" }}</div></div>
+        <div class="info-row"><div class="info-label">Delivery Days:</div><div>{{ order.delivery_days }} days</div></div>
+
+        {% if order.status == 'active' or order.status == 'pending' %}
+        <div class="dispute-box">
+            <h3>⚖️ Dispute Resolution</h3>
+            <form method="POST" action="{% url 'adminpanel:resolve_dispute' order.id %}" style="margin-top: 15px;">
+                {% csrf_token %}
+                <button type="submit" name="action" value="refund_buyer" class="btn btn-refund">Refund to Buyer</button>
+                <button type="submit" name="action" value="release_payment" class="btn btn-release">Release Payment to Seller</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

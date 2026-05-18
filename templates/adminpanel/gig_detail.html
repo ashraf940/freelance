@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gig Details - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+    .gig-card { background: white; border-radius: 20px; border: 1px solid #e5e7eb; padding: 25px; margin-bottom: 25px; }
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
+    .btn { padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-block; }
+    .btn-approve { background: #10b981; color: white; }
+    .btn-reject { background: #ef4444; color: white; }
+    .btn-feature { background: #f59e0b; color: white; }
+    .info-row { display: flex; padding: 10px 0; border-bottom: 1px solid #e5e7eb; }
+    .info-label { width: 150px; font-weight: 600; color: #6b7280; }
+</style>
+
+<div class="admin-container">
+    <a href="{% url 'adminpanel:gigs' %}" style="color:#3b82f6; text-decoration:none; display:inline-block; margin-bottom:20px;">← Back to Gigs</a>
+
+    <div class="gig-card">
+        <h2>{{ gig.title }}</h2>
+        <p>by {{ gig.freelancer.get_full_name|default:gig.freelancer.email }} • Category: {{ gig.category.name }}</p>
+        <p><span class="status-badge" style="background: {% if gig.status == 'active' %}#d1fae5{% elif gig.status == 'pending' %}#fef3c7{% else %}#e5e7eb{% endif %}">{{ gig.status|title }}</span></p>
+
+        <div class="action-buttons">
+            {% if gig.status == 'pending' %}
+            <a href="{% url 'adminpanel:gig_approve' gig.id %}" class="btn btn-approve" onclick="return confirm('Approve this gig?')">✓ Approve Gig</a>
+            <a href="{% url 'adminpanel:gig_reject' gig.id %}" class="btn btn-reject" onclick="return confirm('Reject this gig?')">✗ Reject Gig</a>
+            {% endif %}
+            {% if gig.status == 'active' %}
+            <a href="{% url 'adminpanel:gig_feature' gig.id %}" class="btn btn-feature" onclick="return confirm('Toggle featured status?')">{% if gig.is_featured %}★ Remove Featured{% else %}☆ Mark Featured{% endif %}</a>
+            {% endif %}
+        </div>
+
+        <div class="info-row"><div class="info-label">Title:</div><div>{{ gig.title }}</div></div>
+        <div class="info-row"><div class="info-label">Freelancer:</div><div>{{ gig.freelancer.email }}</div></div>
+        <div class="info-row"><div class="info-label">Category:</div><div>{{ gig.category.name }}</div></div>
+        <div class="info-row"><div class="info-label">Price:</div><div>${{ gig.price|floatformat:2 }}</div></div>
+        <div class="info-row"><div class="info-label">Delivery Days:</div><div>{{ gig.delivery_days }} days</div></div>
+        <div class="info-row"><div class="info-label">Revisions:</div><div>{{ gig.revisions }}</div></div>
+        <div class="info-row"><div class="info-label">Views:</div><div>{{ gig.views }}</div></div>
+        <div class="info-row"><div class="info-label">Orders:</div><div>{{ gig.orders_count }}</div></div>
+        <div class="info-row"><div class="info-label">Rating:</div><div>{{ gig.rating|default:"0" }} ⭐ ({{ gig.total_reviews }} reviews)</div></div>
+        <div class="info-row"><div class="info-label">Description:</div><div>{{ gig.description|linebreaks }}</div></div>
+        {% if gig.rejection_reason %}<div class="info-row"><div class="info-label">Rejection Reason:</div><div>{{ gig.rejection_reason }}</div></div>{% endif %}
+    </div>
+</div>
+{% endblock %}

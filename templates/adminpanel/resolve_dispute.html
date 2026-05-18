@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resolve Dispute - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container { max-width: 800px; margin: 0 auto; padding: 30px 20px; }
+    .dispute-card { background: white; border-radius: 20px; border: 1px solid #e5e7eb; padding: 30px; text-align: center; }
+    .btn-refund { background: #ef4444; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; margin: 10px; }
+    .btn-release { background: #10b981; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; margin: 10px; }
+    .warning { background: #fef3c7; padding: 15px; border-radius: 12px; margin: 20px 0; }
+</style>
+
+<div class="admin-container">
+    <div class="dispute-card">
+        <h2>Resolve Dispute - Order #{{ order.order_number }}</h2>
+        <p><strong>Buyer:</strong> {{ order.buyer.email }}</p>
+        <p><strong>Seller:</strong> {{ order.seller.email }}</p>
+        <p><strong>Amount:</strong> ${{ order.total_amount|floatformat:2 }}</p>
+
+        <div class="warning">
+            <p>⚠️ This action is irreversible. Choose carefully.</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="action" value="refund_buyer" class="btn-refund" onclick="return confirm('Refund to buyer? This will cancel the order.')">
+                🔄 Refund to Buyer
+            </button>
+            <button type="submit" name="action" value="release_payment" class="btn-release" onclick="return confirm('Release payment to seller? This will complete the order.')">
+                💰 Release Payment to Seller
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Gig - Freelance Platform{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-bold mb-6">Edit Gig</h1>
+        
+        {% if messages %}
+            {% for message in messages %}
+            <div class="mb-4 p-3 rounded {% if message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Category *</label>
+                <select name="category" class="w-full border rounded-lg px-3 py-2" required>
+                    <option value="">Select Category</option>
+                    {% for cat in form.fields.category.queryset %}
+                    <option value="{{ cat.id }}" {% if gig.category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Title *</label>
+                <input type="text" name="title" value="{{ gig.title }}" required class="w-full border rounded-lg px-3 py-2">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Short Description *</label>
+                <textarea name="short_description" rows="2" class="w-full border rounded-lg px-3 py-2">{{ gig.short_description }}</textarea>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Full Description *</label>
+                <textarea name="description" rows="5" class="w-full border rounded-lg px-3 py-2">{{ gig.description }}</textarea>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Price ($) *</label>
+                    <input type="number" name="price" step="0.01" value="{{ gig.price }}" required class="w-full border rounded-lg px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Delivery Days *</label>
+                    <input type="number" name="delivery_days" value="{{ gig.delivery_days }}" required class="w-full border rounded-lg px-3 py-2">
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Current Image</label>
+                {% if gig.featured_image %}
+                <div class="mt-2">
+                    <img src="{{ gig.featured_image.url }}" alt="{{ gig.title }}" class="w-32 h-32 object-cover rounded">
+                </div>
+                {% endif %}
+                <label class="block text-sm font-medium mb-1 mt-2">Change Image</label>
+                <input type="file" name="featured_image" accept="image/*" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            
+            <div class="flex gap-3">
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                    Update Gig
+                </button>
+                <a href="{% url 'gigs:my_gigs' %}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

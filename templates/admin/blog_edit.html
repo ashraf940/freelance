@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 800px; margin: auto; padding: 20px;">
+    <h1>Edit Blog</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 15px;">
+            <label>Title:</label>
+            <input type="text" name="title" value="{{ post.title }}" required style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>Category:</label>
+            <select name="category" required style="width: 100%; padding: 8px; margin-top: 5px;">
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if post.category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>Abstract:</label>
+            <textarea name="abstract" rows="3" style="width: 100%; padding: 8px; margin-top: 5px;">{{ post.abstract }}</textarea>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>Introduction:</label>
+            <textarea name="introduction" rows="5" style="width: 100%; padding: 8px; margin-top: 5px;">{{ post.introduction }}</textarea>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>Keywords:</label>
+            <input type="text" name="keywords" value="{{ post.keywords }}" style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+        
+        <button type="submit" style="background: green; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Save</button>
+        <a href="/admin-panel/blog-posts/" style="margin-left: 10px;">Back</a>
+    </form>
+</div>
+{% endblock %}

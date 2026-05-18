@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 800px; margin: auto; padding: 20px;">
+    <h1>Add New Blog</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 15px;">
+            <label>Title:</label>
+            <input type="text" name="title" required style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>Category:</label>
+            <select name="category" required style="width: 100%; padding: 8px; margin-top: 5px;">
+                <option value="">Select Category</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>Abstract:</label>
+            <textarea name="abstract" rows="3" style="width: 100%; padding: 8px; margin-top: 5px;"></textarea>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>Introduction:</label>
+            <textarea name="introduction" rows="5" style="width: 100%; padding: 8px; margin-top: 5px;"></textarea>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>Keywords (comma separated):</label>
+            <input type="text" name="keywords" style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>Reading Time (minutes):</label>
+            <input type="number" name="reading_time" value="5" style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+        
+        <button type="submit" style="background: blue; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Publish</button>
+        <a href="/admin-panel/blog-posts/" style="margin-left: 10px;">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,456 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chat with {{ other_user.get_full_name|default:other_user.username }} - TazaMall™{% endblock %}
+
+{% block content %}
+<style>
+:root{
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --secondary:#3b82f6;
+    --bg:#f4f7ff;
+    --white:#ffffff;
+    --dark:#0f172a;
+    --gray:#64748b;
+    --light:#e2e8f0;
+    --shadow:0 10px 40px rgba(37,99,235,.12);
+    --radius:24px;
+}
+
+/* PAGE */
+.chat-page{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at top left,#dbeafe 0%,transparent 30%),
+        radial-gradient(circle at bottom right,#bfdbfe 0%,transparent 30%),
+        var(--bg);
+    padding:30px 15px;
+}
+
+/* CHAT BOX */
+.chat-wrapper{
+    max-width:1100px;
+    margin:auto;
+    background:rgba(255,255,255,.8);
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,.5);
+    border-radius:30px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+}
+
+/* HEADER */
+.chat-header{
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
+    padding:22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    color:white;
+}
+
+.chat-user{
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
+.back-btn{
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,.15);
+    color:white;
+    text-decoration:none;
+    transition:.3s;
+}
+
+.back-btn:hover{
+    background:white;
+    color:#2563eb;
+    transform:translateX(-3px);
+}
+
+.avatar{
+    width:55px;
+    height:55px;
+    border-radius:18px;
+    background:white;
+    color:#2563eb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    font-weight:700;
+    box-shadow:0 5px 20px rgba(0,0,0,.15);
+}
+
+.user-info h2{
+    margin:0;
+    font-size:20px;
+    font-weight:700;
+}
+
+.status{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:13px;
+    opacity:.9;
+    margin-top:4px;
+}
+
+.status-dot{
+    width:8px;
+    height:8px;
+    background:#22c55e;
+    border-radius:50%;
+}
+
+/* CHAT BODY */
+.chat-body{
+    height:70vh;
+    overflow-y:auto;
+    padding:30px 20px;
+    background:
+        linear-gradient(rgba(255,255,255,.85),rgba(255,255,255,.85)),
+        url('https://www.transparenttextures.com/patterns/cubes.png');
+}
+
+/* MESSAGES */
+.message-row{
+    display:flex;
+    margin-bottom:18px;
+}
+
+.message-row.me{
+    justify-content:flex-end;
+}
+
+.message{
+    max-width:75%;
+    padding:14px 18px;
+    border-radius:22px;
+    position:relative;
+    animation:fadeIn .3s ease;
+}
+
+.message.me{
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
+    color:white;
+    border-bottom-right-radius:8px;
+    box-shadow:0 8px 20px rgba(37,99,235,.2);
+}
+
+.message.other{
+    background:white;
+    color:#0f172a;
+    border-bottom-left-radius:8px;
+    border:1px solid #e2e8f0;
+    box-shadow:0 4px 10px rgba(0,0,0,.04);
+}
+
+.message p{
+    margin:0;
+    line-height:1.6;
+    word-break:break-word;
+}
+
+.message-time{
+    font-size:11px;
+    margin-top:8px;
+    opacity:.7;
+}
+
+/* INPUT AREA */
+.chat-input-area{
+    background:white;
+    padding:20px;
+    border-top:1px solid #e2e8f0;
+}
+
+.chat-form{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.chat-input{
+    flex:1;
+    border:none;
+    background:#f1f5f9;
+    height:60px;
+    border-radius:18px;
+    padding:0 22px;
+    font-size:15px;
+    transition:.3s;
+    outline:none;
+}
+
+.chat-input:focus{
+    background:white;
+    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+}
+
+.send-btn{
+    min-width:60px;
+    height:60px;
+    border:none;
+    border-radius:18px;
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    transition:.3s;
+    box-shadow:0 8px 20px rgba(37,99,235,.25);
+}
+
+.send-btn:hover{
+    transform:translateY(-3px) scale(1.04);
+}
+
+/* EMPTY */
+.empty-chat{
+    text-align:center;
+    padding-top:100px;
+    color:#64748b;
+}
+
+.empty-chat i{
+    font-size:60px;
+    color:#93c5fd;
+    margin-bottom:15px;
+}
+
+/* SCROLL */
+.chat-body::-webkit-scrollbar{
+    width:8px;
+}
+
+.chat-body::-webkit-scrollbar-thumb{
+    background:#bfdbfe;
+    border-radius:20px;
+}
+
+/* ANIMATION */
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+    .chat-wrapper{
+        border-radius:20px;
+    }
+
+    .chat-header{
+        padding:16px;
+    }
+
+    .avatar{
+        width:48px;
+        height:48px;
+        font-size:18px;
+    }
+
+    .user-info h2{
+        font-size:17px;
+    }
+
+    .chat-body{
+        height:65vh;
+        padding:20px 14px;
+    }
+
+    .message{
+        max-width:90%;
+        padding:12px 15px;
+    }
+
+    .chat-input{
+        height:54px;
+        font-size:14px;
+    }
+
+    .send-btn{
+        width:54px;
+        height:54px;
+    }
+}
+</style>
+
+<div class="chat-page">
+    <div class="chat-wrapper">
+
+        <!-- HEADER -->
+        <div class="chat-header">
+
+            <div class="chat-user">
+
+                <a href="{% url 'chat:chat_list' %}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+
+                <div class="avatar" style="padding:0; overflow:hidden;">
+                    {% if other_user.avatar %}
+                        <img src="{{ other_user.avatar.url }}" 
+                            alt="{{ other_user.username }}"
+                            style="width:100%; height:100%; object-fit:cover; border-radius:18px;">
+                    {% else %}
+                        {% if other_user.get_full_name %}
+                            {{ other_user.get_full_name|first|upper }}
+                        {% else %}
+                            {{ other_user.username|first|upper }}
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="user-info">
+                    <h2>
+                        {{ other_user.get_full_name|default:other_user.username }}
+                    </h2>
+
+                    <div class="status">
+                        <span class="status-dot"></span>
+                        Active Now
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- CHAT BODY -->
+        <div id="chat-messages" class="chat-body">
+
+            {% for msg in chat_messages %}
+
+            <div class="message-row {% if msg.sender == request.user %}me{% endif %}">
+
+                <div class="message {% if msg.sender == request.user %}me{% else %}other{% endif %}">
+
+                    <p>{{ msg.message }}</p>
+
+                    <div class="message-time">
+                        {{ msg.created_at|date:"h:i A" }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <div class="empty-chat">
+                <i class="fas fa-comments"></i>
+                <h3>No Messages Yet</h3>
+                <p>Start your professional conversation now.</p>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- INPUT -->
+        <div class="chat-input-area">
+
+            <form id="chat-form" class="chat-form">
+                {% csrf_token %}
+
+                <input
+                    type="text"
+                    id="chat-message-input"
+                    class="chat-input"
+                    placeholder="Write your message..."
+                    autocomplete="off"
+                >
+
+                <button type="submit" class="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+const roomId = "{{ room.id }}";
+const userId = "{{ request.user.id }}";
+
+const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+
+const chatSocket = new WebSocket(
+    protocol + window.location.host + '/ws/chat/' + roomId + '/'
+);
+
+chatSocket.onmessage = function(e) {
+
+    const data = JSON.parse(e.data);
+
+    const messagesDiv = document.getElementById('chat-messages');
+
+    const messageRow = document.createElement('div');
+
+    messageRow.className =
+        data.sender_id == userId
+        ? 'message-row me'
+        : 'message-row';
+
+    messageRow.innerHTML = `
+        <div class="message ${data.sender_id == userId ? 'me' : 'other'}">
+            <p>${data.message}</p>
+            <div class="message-time">Just now</div>
+        </div>
+    `;
+
+    messagesDiv.appendChild(messageRow);
+
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+};
+
+chatSocket.onclose = function(e) {
+    console.error('Socket closed unexpectedly');
+};
+
+document.getElementById('chat-form').onsubmit = function(e) {
+
+    e.preventDefault();
+
+    const input = document.getElementById('chat-message-input');
+
+    const message = input.value.trim();
+
+    if(message){
+
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'sender_id': userId,
+            'room_id': roomId
+        }));
+
+        input.value = '';
+    }
+};
+
+window.onload = () => {
+    const messagesDiv = document.getElementById('chat-messages');
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+};
+</script>
+
+{% endblock %}

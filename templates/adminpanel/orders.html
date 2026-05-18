@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Orders - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+    .filter-bar { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; background: white; padding: 15px; border-radius: 12px; border: 1px solid #e5e7eb; }
+    .orders-table { background: white; border-radius: 16px; border: 1px solid #e5e7eb; overflow-x: auto; }
+    .orders-table table { width: 100%; border-collapse: collapse; }
+    .orders-table th, .orders-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .status-active { background: #dbeafe; color: #1e40af; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+</style>
+
+<div class="admin-container">
+    <div class="admin-header"><h1>Manage Orders</h1><p>View and manage all platform orders</p></div>
+
+    <div class="filter-bar">
+        <form method="get" style="display: flex; gap: 10px; width: 100%; flex-wrap: wrap;">
+            <input type="text" name="search" placeholder="Search by order #, buyer, seller..." value="{{ request.GET.search|default:'' }}">
+            <select name="status"><option value="">All Status</option><option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option><option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option><option value="delivered" {% if status_filter == 'delivered' %}selected{% endif %}>Delivered</option><option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option><option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option></select>
+            <button type="submit">Filter</button>
+            <a href="{% url 'adminpanel:orders' %}" style="padding: 8px 16px; background: #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151;">Clear</a>
+        </form>
+    </div>
+
+    <div class="orders-table">
+        <table>
+            <thead><tr><th>Order #</th><th>Buyer</th><th>Seller</th><th>Gig</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.order_number|truncatechars:12 }}</td><td>{{ order.buyer.email|truncatechars:20 }}</td>
+                    <td>{{ order.seller.email|truncatechars:20 }}</td><td>{{ order.gig.title|truncatechars:30 }}</td>
+                    <td>${{ order.total_amount|floatformat:2 }}</td>
+                    <td><span class="status-badge status-{{ order.status }}">{{ order.status|title }}</span></td>
+                    <td>{{ order.created_at|date:"M d, Y" }}</td>
+                    <td><a href="{% url 'adminpanel:order_detail' order.id %}" style="color:#3b82f6;">View</a></td>
+                </tr>
+                {% empty %} <tr><td colspan="8" style="text-align:center;padding:50px">No orders found</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

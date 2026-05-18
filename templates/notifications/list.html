@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications - Freelance Platform{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="container mx-auto px-4 max-w-3xl">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">Notifications</h1>
+            {% if unread_count > 0 %}
+            <button onclick="markAllRead()" class="text-blue-600 hover:underline text-sm">
+                Mark all as read
+            </button>
+            {% endif %}
+        </div>
+        
+        {% if notifications %}
+        <div class="space-y-2">
+            {% for notification in notifications %}
+            <div class="bg-white rounded-lg shadow border {% if not notification.is_read %}border-blue-300 bg-blue-50{% else %}border-gray-200{% endif %} p-4 hover:shadow-md transition">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            {% if notification.notification_type == 'order_created' %}
+                            <i class="fas fa-shopping-cart text-green-500"></i>
+                            {% elif notification.notification_type == 'order_delivered' %}
+                            <i class="fas fa-truck text-blue-500"></i>
+                            {% elif notification.notification_type == 'order_completed' %}
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            {% elif notification.notification_type == 'order_cancelled' %}
+                            <i class="fas fa-times-circle text-red-500"></i>
+                            {% elif notification.notification_type == 'review_received' %}
+                            <i class="fas fa-star text-yellow-500"></i>
+                            {% else %}
+                            <i class="fas fa-bell text-gray-500"></i>
+                            {% endif %}
+                            <h3 class="font-semibold text-gray-900">{{ notification.title }}</h3>
+                            {% if not notification.is_read %}
+                            <span class="px-2 py-0.5 bg-blue-500 text-white text-xs rounded-full">New</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-gray-600 text-sm">{{ notification.message }}</p>
+                        <p class="text-gray-400 text-xs mt-2">{{ notification.created_at|timesince }} ago</p>
+                    </div>
+                    <div class="flex gap-2">
+                        {% if notification.link %}
+                        <a href="javascript:void(0);" onclick="markAndRedirect('{{ notification.id }}', '{{ notification.link|escapejs }}')"  
+                           class="text-blue-600 hover:underline text-sm">
+                            View →
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow border border-gray-200 p-12 text-center">
+            <i class="far fa-bell text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">No notifications</h3>
+            <p class="text-gray-500">You're all caught up!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function getCookie(name) {
+    let value = "; " + document.cookie;
+    let parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+}
+
+function markAndRedirect(notificationId, link) {
+    // First mark as read, then redirect
+    fetch(`/notifications/mark-read/${notificationId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    }).then(() => {
+        window.location.href = link;
+    }).catch(() => {
+        // If error, still redirect
+        window.location.href = link;
+    });
+}
+
+function markAllRead() {
+    fetch('/notifications/mark-all-read/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    }).then(() => {
+        location.reload();
+    });
+}
+</script>
+{% endblock %}

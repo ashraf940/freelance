@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Gig - Freelance Platform{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-bold mb-6">Create New Gig</h1>
+        
+        {% if messages %}
+            {% for message in messages %}
+            <div class="mb-4 p-3 rounded {% if message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Category *</label>
+                <select name="category" class="w-full border rounded-lg px-3 py-2" required>
+                    <option value="">Select Category</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Title *</label>
+                <input type="text" name="title" required class="w-full border rounded-lg px-3 py-2" minlength="10">
+                <p class="text-xs text-gray-500 mt-1">Title must be at least 10 characters</p>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Short Description *</label>
+                <textarea name="short_description" rows="2" class="w-full border rounded-lg px-3 py-2"></textarea>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Full Description *</label>
+                <textarea name="description" rows="5" class="w-full border rounded-lg px-3 py-2"></textarea>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Price ($) *</label>
+                    <input type="number" name="price" step="0.01" required min="5" class="w-full border rounded-lg px-3 py-2">
+                    <p class="text-xs text-gray-500 mt-1">Minimum $5</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Delivery Days *</label>
+                    <input type="number" name="delivery_days" required min="1" class="w-full border rounded-lg px-3 py-2">
+                    <p class="text-xs text-gray-500 mt-1">Minimum 1 day</p>
+                </div>
+            </div>
+            
+            <!-- Revisions Field -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Revisions</label>
+                <input type="number" name="revisions" value="1" min="0" max="10" class="w-full border rounded-lg px-3 py-2">
+                <p class="text-xs text-gray-500 mt-1">Number of free revisions (0-10)</p>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Featured Image</label>
+                <input type="file" name="featured_image" accept="image/*" class="w-full border rounded-lg px-3 py-2">
+                <p class="text-xs text-gray-500 mt-1">Optional - Main image for your gig</p>
+            </div>
+            
+            <div class="flex gap-3">
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                    Create Gig
+                </button>
+                <a href="{% url 'gigs:my_gigs' %}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

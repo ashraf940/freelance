@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Gigs - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+    .filter-bar { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; background: white; padding: 15px; border-radius: 12px; border: 1px solid #e5e7eb; }
+    .filter-bar select, .filter-bar input { padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; }
+    .gigs-table { background: white; border-radius: 16px; border: 1px solid #e5e7eb; overflow-x: auto; }
+    .gigs-table table { width: 100%; border-collapse: collapse; }
+    .gigs-table th, .gigs-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    .gigs-table th { background: #f9fafb; }
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .btn-link { color: #3b82f6; text-decoration: none; margin: 0 5px; }
+    .btn-approve { color: #10b981; }
+    .btn-reject { color: #ef4444; }
+</style>
+
+<div class="admin-container">
+    <div class="admin-header"><h1>Manage Gigs</h1><p>View, approve, and manage all gigs</p></div>
+
+    <div class="filter-bar">
+        <form method="get" style="display: flex; gap: 10px; width: 100%; flex-wrap: wrap;">
+            <input type="text" name="search" placeholder="Search by title..." value="{{ request.GET.search|default:'' }}">
+            <select name="status"><option value="">All Status</option><option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option><option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option><option value="paused" {% if status_filter == 'paused' %}selected{% endif %}>Paused</option><option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option></select>
+            <select name="category"><option value="">All Categories</option>{% for cat in categories %}<option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:'s' %}selected{% endif %}>{{ cat.name }}</option>{% endfor %}</select>
+            <button type="submit">Filter</button>
+            <a href="{% url 'adminpanel:gigs' %}" style="padding: 8px 16px; background: #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151;">Clear</a>
+        </form>
+    </div>
+
+    <div class="gigs-table">
+        <table>
+            <thead><tr><th>Title</th><th>Freelancer</th><th>Category</th><th>Price</th><th>Orders</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for gig in gigs %}
+                <tr>
+                    <td>{{ gig.title|truncatechars:40 }}</td><td>{{ gig.freelancer.email }}</td><td>{{ gig.category.name }}</td><td>${{ gig.price|floatformat:2 }}</td><td>{{ gig.orders_count }}</td><td>{{ gig.rating|default:"0" }} ⭐</td>
+                    <td><span class="status-badge" style="background: {% if gig.status == 'active' %}#d1fae5{% elif gig.status == 'pending' %}#fef3c7{% elif gig.status == 'rejected' %}#fee2e2{% else %}#e5e7eb{% endif %}">{{ gig.status|title }}</span></td>
+                    <td><a href="{% url 'adminpanel:gig_detail' gig.id %}" class="btn-link">View</a></td>
+                </tr>
+                {% empty %}<tr><td colspan="8" style="text-align:center;padding:50px">No gigs found</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

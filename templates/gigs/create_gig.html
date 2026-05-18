@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create New Gig - Freelance Platform{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-8">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Create New Gig</h1>
+            <p class="text-gray-600 mb-6">Tell the world what you can deliver</p>
+            
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Category -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.category.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Sub Category -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sub Category</label>
+                    {{ form.sub_category }}
+                </div>
+                
+                <!-- Title -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Gig Title *</label>
+                    {{ form.title }}
+                    <p class="text-xs text-gray-500 mt-1">Clear, descriptive title (min 10 characters)</p>
+                    {% if form.title.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.title.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Short Description -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Short Description *</label>
+                    {{ form.short_description }}
+                    <p class="text-xs text-gray-500 mt-1">Brief summary that appears in search results</p>
+                </div>
+                
+                <!-- Full Description -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Description *</label>
+                    {{ form.description }}
+                    <p class="text-xs text-gray-500 mt-1">Detailed description of what you'll deliver</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Price -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Price ($) *</label>
+                        {{ form.price }}
+                        <p class="text-xs text-gray-500 mt-1">Minimum $5</p>
+                        {% if form.price.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.price.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Delivery Days -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Delivery Days *</label>
+                        {{ form.delivery_days }}
+                        <p class="text-xs text-gray-500 mt-1">Number of days to complete</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Revisions -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Revisions</label>
+                        {{ form.revisions }}
+                        <p class="text-xs text-gray-500 mt-1">Number of free revisions</p>
+                    </div>
+                    
+                    <!-- Tags -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                        {{ form.tags }}
+                        <p class="text-xs text-gray-500 mt-1">Comma separated (e.g., python, django, web)</p>
+                    </div>
+                </div>
+                
+                <!-- Featured Image -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Featured Image *</label>
+                    {{ form.featured_image }}
+                    <p class="text-xs text-gray-500 mt-1">Main image for your gig (recommended: 800x600)</p>
+                    {% if form.featured_image.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.featured_image.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Video URL -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Video URL (Optional)</label>
+                    {{ form.video_url }}
+                    <p class="text-xs text-gray-500 mt-1">YouTube or Vimeo link</p>
+                </div>
+                
+                <!-- Meta Tags for SEO -->
+                <div class="border-t border-gray-200 pt-6">
+                    <h3 class="text-lg font-semibold mb-4">SEO Settings (Optional)</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Meta Title</label>
+                            {{ form.meta_title }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Meta Description</label>
+                            {{ form.meta_description }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-3 pt-4">
+                    <a href="{% url 'gigs:my_gigs' %}" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        Cancel
+                    </a>
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        Create Gig
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dynamic subcategory loading based on category
+    document.querySelector('select[name="category"]').addEventListener('change', function() {
+        const categoryId = this.value;
+        const subCategorySelect = document.querySelector('select[name="sub_category"]');
+        
+        if (categoryId) {
+            fetch(`/gigs/api/categories/${categoryId}/subcategories/`)
+                .then(response => response.json())
+                .then(data => {
+                    subCategorySelect.innerHTML = '<option value="">Select Sub Category</option>';
+                    data.forEach(sub => {
+                        subCategorySelect.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
+                    });
+                });
+        }
+    });
+</script>
+{% endblock %}

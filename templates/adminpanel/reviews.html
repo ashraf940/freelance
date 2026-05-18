@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reviews - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+    .filter-bar { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; background: white; padding: 15px; border-radius: 12px; border: 1px solid #e5e7eb; }
+    .reviews-table { background: white; border-radius: 16px; border: 1px solid #e5e7eb; overflow-x: auto; }
+    .reviews-table table { width: 100%; border-collapse: collapse; }
+    .reviews-table th, .reviews-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    .stars { color: #f59e0b; font-size: 12px; }
+    .btn-delete { color: #ef4444; text-decoration: none; }
+    .btn-delete:hover { text-decoration: underline; }
+</style>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Reviews Management</h1>
+        <p>Monitor and manage user reviews</p>
+    </div>
+
+    <div class="filter-bar">
+        <form method="get" style="display: flex; gap: 10px; width: 100%; flex-wrap: wrap;">
+            <input type="text" name="search" placeholder="Search by comment, reviewer..." value="{{ request.GET.search|default:'' }}" style="flex:1; padding:8px; border:1px solid #e5e7eb; border-radius:8px;">
+            <button type="submit" style="background:#3b82f6; color:white; border:none; padding:8px 20px; border-radius:8px;">Search</button>
+            <a href="{% url 'adminpanel:reviews' %}" style="padding:8px 16px; background:#e5e7eb; border-radius:8px; text-decoration:none; color:#374151;">Clear</a>
+        </form>
+    </div>
+
+    <div class="reviews-table">
+        <table>
+            <thead>
+                <tr><th>Reviewer</th><th>Freelancer</th><th>Gig</th><th>Rating</th><th>Comment</th><th>Date</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+                {% for review in reviews %}
+                <tr>
+                    <td>{{ review.reviewer.email|truncatechars:20 }}</td>
+                    <td>{{ review.freelancer.email|truncatechars:20 }}</td>
+                    <td>{{ review.gig.title|truncatechars:30 }}</td>
+                    <td><div class="stars">{% for i in "12345"|make_list %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %} ({{ review.rating }})</div></td>
+                    <td>{{ review.comment|truncatechars:50|default:"-" }}</td>
+                    <td>{{ review.created_at|date:"M d, Y" }}</td>
+                    <td><a href="{% url 'adminpanel:review_delete' review.id %}" class="btn-delete" onclick="return confirm('Delete this review?')">Delete</a></td>
+                 </tr>
+                {% empty %}
+                <tr><td colspan="7" style="text-align:center;padding:50px">No reviews found</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

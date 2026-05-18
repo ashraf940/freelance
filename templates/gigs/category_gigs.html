@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} Gigs - Freelance Platform{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="container mx-auto px-4">
+        <div class="mb-8">
+            <div class="flex items-center gap-3">
+                <i class="fas {{ category.icon }} text-3xl text-blue-500"></i>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ category.name }}</h1>
+                    <p class="text-gray-600 mt-1">{{ category.description|default:"Find the best freelance services in this category" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        {% if subcategories %}
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold mb-3">Sub Categories</h2>
+            <div class="flex flex-wrap gap-2">
+                <a href="{% url 'gigs:category_gigs' category.slug %}" class="px-4 py-2 rounded-full {% if not request.GET.subcategory %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-700{% endif %} hover:opacity-80 transition">
+                    All
+                </a>
+                {% for sub in subcategories %}
+                <a href="?subcategory={{ sub.id }}" class="px-4 py-2 rounded-full {% if request.GET.subcategory == sub.id|stringformat:'s' %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-700{% endif %} hover:opacity-80 transition">
+                    {{ sub.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if gigs %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for gig in gigs %}
+            {% include 'gigs/includes/gig_card.html' with gig=gig %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
+            <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-700">No gigs in this category yet</h3>
+            <p class="text-gray-500 mt-2">Be the first to offer services in this category</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

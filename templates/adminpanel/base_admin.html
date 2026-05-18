@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .admin-layout {
+        display: flex;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+        gap: 30px;
+    }
+    .admin-sidebar {
+        width: 280px;
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #e5e7eb;
+        padding: 20px;
+        height: fit-content;
+        position: sticky;
+        top: 90px;
+    }
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 15px;
+        border-radius: 12px;
+        color: #4b5563;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .sidebar-link:hover {
+        background: #f3f4f6;
+        color: #3b82f6;
+    }
+    .sidebar-link.active {
+        background: #3b82f6;
+        color: white;
+    }
+    .admin-content {
+        flex: 1;
+        min-width: 0;
+    }
+    @media (max-width: 900px) {
+        .admin-layout { flex-direction: column; }
+        .admin-sidebar { width: 100%; position: static; }
+        .sidebar-nav { display: flex; flex-wrap: wrap; gap: 5px; }
+        .sidebar-link { flex: 1; min-width: 120px; justify-content: center; }
+    }
+</style>
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="font-bold text-gray-700 pb-3 border-b mb-3">📋 Admin Menu</div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'adminpanel:dashboard' %}" class="sidebar-link">
+                <i class="fas fa-tachometer-alt w-5"></i> Dashboard
+            </a>
+            <a href="{% url 'adminpanel:users' %}" class="sidebar-link">
+                <i class="fas fa-users w-5"></i> Users
+            </a>
+            <a href="{% url 'adminpanel:gigs' %}" class="sidebar-link">
+                <i class="fas fa-briefcase w-5"></i> Gigs
+            </a>
+            <a href="{% url 'adminpanel:orders' %}" class="sidebar-link">
+                <i class="fas fa-shopping-cart w-5"></i> Orders
+            </a>
+            <a href="{% url 'adminpanel:withdrawals' %}" class="sidebar-link">
+                <i class="fas fa-money-bill-wave w-5"></i> Withdrawals
+            </a>
+            <a href="{% url 'adminpanel:reviews' %}" class="sidebar-link">
+                <i class="fas fa-star w-5"></i> Reviews
+            </a>
+            <a href="{% url 'adminpanel:settings' %}" class="sidebar-link">
+                <i class="fas fa-cog w-5"></i> Settings
+            </a>
+            <a href="{% url 'adminpanel:announcements' %}" class="sidebar-link">
+                <i class="fas fa-bullhorn w-5"></i> Announcements
+            </a>
+        </nav>
+    </aside>
+
+    <div class="admin-content">
+        {% block admin_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

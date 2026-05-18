@@ -1,0 +1,705 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ gig.title }} - TazaMall™{% endblock %}
+
+{% block content %}
+<style>
+    /* ========== PREMIUM DESIGN SYSTEM ========== */
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --primary-light: #818cf8;
+        --secondary: #8b5cf6;
+        --secondary-dark: #7c3aed;
+        --secondary-light: #a78bfa;
+        --accent: #f59e0b;
+        --accent-dark: #d97706;
+        --dark: #0f172a;
+        --dark-light: #1e293b;
+        --gray: #64748b;
+        --gray-light: #94a3b8;
+        --light: #f8fafc;
+        --border: #e2e8f0;
+        --success: #10b981;
+        --danger: #ef4444;
+        --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        --gradient-secondary: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+        --gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
+        --shadow-2xl: 0 25px 50px -12px rgba(0,0,0,0.25);
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+        --radius-2xl: 2rem;
+    }
+
+    /* ========== ANIMATIONS ========== */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInLeft {
+        from { opacity: 0; transform: translateX(-30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); }
+        50% { box-shadow: 0 0 0 15px rgba(99,102,241,0); }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+    }
+
+    .animate-fade-up { animation: fadeInUp 0.6s ease-out forwards; }
+    .animate-slide-left { animation: slideInLeft 0.5s ease-out forwards; }
+    .animate-slide-right { animation: slideInRight 0.5s ease-out forwards; }
+    .animate-pulse-glow { animation: pulse-glow 2s infinite; }
+
+    /* ========== BODY BACKGROUND ========== */
+    body {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    /* ========== BREADCRUMB ========== */
+    .breadcrumb {
+        margin-bottom: 1.5rem;
+        animation: slideInLeft 0.5s ease-out;
+    }
+
+    .breadcrumb a {
+        color: var(--gray);
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.2s ease;
+    }
+
+    .breadcrumb a:hover {
+        color: var(--primary);
+    }
+
+    .breadcrumb .separator {
+        color: var(--gray-light);
+        margin: 0 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .breadcrumb .current {
+        color: var(--dark);
+        font-weight: 600;
+    }
+
+    /* ========== GIG TITLE ========== */
+    .gig-title-premium {
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--dark), var(--dark-light));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+    }
+
+    /* ========== SELLER CARD PREMIUM ========== */
+    .seller-card-premium {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--border);
+        transition: all 0.3s ease;
+    }
+
+    .seller-card-premium:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-light);
+    }
+
+    .seller-avatar-premium {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid white;
+        box-shadow: var(--shadow-md);
+    }
+
+    .seller-avatar-placeholder-premium {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.75rem;
+        font-weight: 700;
+        border: 3px solid white;
+        box-shadow: var(--shadow-md);
+    }
+
+    .seller-name-premium {
+        font-size: 1.125rem;
+        font-weight: 800;
+        color: var(--dark);
+        margin-bottom: 0.25rem;
+    }
+
+    .seller-badge-premium {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+        padding: 0.25rem 0.75rem;
+        border-radius: 100px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    /* ========== RATING PREMIUM ========== */
+    .rating-premium {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+    }
+
+    .stars-premium {
+        color: var(--accent);
+        font-size: 0.875rem;
+        letter-spacing: 2px;
+    }
+
+    .rating-value-premium {
+        font-weight: 800;
+        color: var(--dark);
+        font-size: 0.875rem;
+    }
+
+    .reviews-count-premium {
+        color: var(--gray);
+        font-size: 0.75rem;
+    }
+
+    /* ========== SECTION TITLE ========== */
+    .section-title-premium {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 1.25rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-title-premium::after {
+        content: '';
+        position: absolute;
+        bottom: -0.5rem;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: var(--gradient-primary);
+        border-radius: 3px;
+    }
+
+    /* ========== DESCRIPTION CARD ========== */
+    .description-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--border);
+        padding: 1.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .description-card:hover {
+        box-shadow: var(--shadow-lg);
+    }
+
+    .description-content {
+        color: var(--dark-light);
+        line-height: 1.8;
+        font-size: 1rem;
+    }
+
+    /* ========== PRICING CARD ========== */
+    .pricing-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--border);
+        padding: 1.75rem;
+        position: sticky;
+        top: 100px;
+        transition: all 0.3s ease;
+    }
+
+    .pricing-card:hover {
+        box-shadow: var(--shadow-xl);
+        border-color: var(--primary-light);
+    }
+
+    .price-premium {
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1;
+    }
+
+    .price-label {
+        color: var(--gray);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .divider-premium {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border), transparent);
+        margin: 1.25rem 0;
+    }
+
+    .stat-item-premium {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .stat-item-premium:last-child {
+        border-bottom: none;
+    }
+
+    .stat-icon-premium {
+        width: 32px;
+        height: 32px;
+        background: #eef2ff;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 0.875rem;
+    }
+
+    .stat-text-premium {
+        flex: 1;
+    }
+
+    .stat-label-premium {
+        font-size: 0.75rem;
+        color: var(--gray);
+    }
+
+    .stat-value-premium {
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    /* ========== BUTTONS PREMIUM ========== */
+    .btn-order-premium {
+        width: 100%;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: var(--radius-lg);
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .btn-order-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        filter: brightness(1.05);
+    }
+
+    .btn-chat-premium {
+        width: 100%;
+        background: transparent;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        padding: 0.875rem;
+        border-radius: var(--radius-lg);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 0.75rem;
+        text-align: center;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+    .btn-chat-premium:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* ========== SAVE BUTTON ========== */
+    .save-btn-premium {
+        background: rgba(255,255,255,0.9);
+        backdrop-filter: blur(8px);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border);
+    }
+
+    .save-btn-premium:hover {
+        transform: scale(1.1);
+        background: white;
+        box-shadow: var(--shadow-lg);
+    }
+
+    /* ========== RELATED GIGS ========== */
+    .related-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        transition: all 0.3s ease;
+    }
+
+    .related-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--primary-light);
+    }
+
+    .related-image {
+        aspect-ratio: 16/11;
+        overflow: hidden;
+    }
+
+    .related-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .related-card:hover .related-image img {
+        transform: scale(1.08);
+    }
+
+    .related-title {
+        font-weight: 700;
+        color: var(--dark);
+        text-decoration: none;
+        transition: color 0.2s ease;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .related-title:hover {
+        color: var(--primary);
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+        .seller-card-premium {
+            padding: 1rem;
+        }
+
+        .seller-avatar-premium,
+        .seller-avatar-placeholder-premium {
+            width: 48px;
+            height: 48px;
+        }
+
+        .price-premium {
+            font-size: 2.5rem;
+        }
+
+        .section-title-premium {
+            font-size: 1.25rem;
+        }
+    }
+</style>
+
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="{% url 'gigs:gig_list' %}">Home</a>
+        <span class="separator">›</span>
+        {% comment %} <a href="{% url 'gigs:category_gigs' gig.category.slug %}">{{ gig.category.name }}</a> {% endcomment %}
+        <span class="separator">›</span>
+        <span class="current">{{ gig.title|truncatechars:50 }}</span>
+    </div>
+
+    <div class="flex flex-wrap -mx-4">
+        <!-- LEFT COLUMN -->
+        <div class="w-full lg:w-2/3 px-4">
+            
+            <!-- Header with Save Button -->
+            <div class="flex justify-between items-start mb-6 animate-fade-up">
+                <h1 class="gig-title-premium">{{ gig.title }}</h1>
+                {% if user.is_authenticated and user != gig.freelancer %}
+                <div class="save-btn-premium" onclick="toggleSaveGig('{{ gig.id }}')">
+                    <i class="{% if is_saved %}fas{% else %}far{% endif %} fa-heart text-red-500 text-xl"></i>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Seller Info Card -->
+            <div class="seller-card-premium animate-slide-left">
+                <div class="flex items-center gap-4">
+                    {% if gig.freelancer.avatar %}
+                        <img src="{{ gig.freelancer.avatar.url }}" 
+                             alt="{{ gig.freelancer.username }}"
+                             class="seller-avatar-premium">
+                    {% else %}
+                        <div class="seller-avatar-placeholder-premium">
+                            {{ gig.freelancer.username|first|upper }}
+                        </div>
+                    {% endif %}
+                    <div class="flex-1">
+                        <div class="seller-name-premium">{{ gig.freelancer.get_full_name|default:gig.freelancer.username }}</div>
+                        <div class="flex items-center gap-2 flex-wrap mt-1">
+                            <div class="seller-badge-premium">
+                                <i class="fas fa-shield-alt"></i> Verified Seller
+                            </div>
+                            {% if gig.freelancer.level %}
+                            <div class="seller-badge-premium">
+                                <i class="fas fa-crown"></i> Level {{ gig.freelancer.level }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="rating-premium">
+                            <div class="stars-premium">
+                                {% with rating=gig.rating|floatformat:"0"|add:"0" %}
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                {% endwith %}
+                            </div>
+                            <span class="rating-value-premium">{{ gig.rating|default:"0.0"|floatformat:1 }}</span>
+                            <span class="reviews-count-premium">({{ gig.total_reviews }} reviews)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Image -->
+            {% if gig.featured_image %}
+            <div class="mb-6 animate-fade-up" style="animation-delay: 0.1s;">
+                <img src="{{ gig.featured_image.url }}" alt="{{ gig.title }}" 
+                     class="w-full rounded-2xl shadow-lg object-cover" style="max-height: 500px;">
+            </div>
+            {% endif %}
+
+            <!-- Description Section -->
+            <div class="description-card animate-fade-up" style="animation-delay: 0.2s;">
+                <h2 class="section-title-premium">About This Gig</h2>
+                <div class="description-content">
+                    {{ gig.description|linebreaks }}
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN - PRICING CARD -->
+        <div class="w-full lg:w-1/3 px-4">
+            <div class="pricing-card animate-slide-right">
+                <div class="text-center mb-4">
+                    <div class="price-premium">${{ gig.price|floatformat:2 }}</div>
+                    <div class="price-label">starting price</div>
+                    <div class="flex items-center justify-center gap-2 mt-2">
+                        <i class="fas fa-clock text-gray-400"></i>
+                        <span class="text-gray-600">{{ gig.delivery_days }} days delivery</span>
+                    </div>
+                </div>
+
+                <div class="divider-premium"></div>
+
+                <!-- Gig Statistics -->
+                <div class="stat-item-premium">
+                    <div class="stat-icon-premium">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="stat-text-premium">
+                        <div class="stat-label-premium">Revisions</div>
+                        <div class="stat-value-premium">{{ gig.revisions }} revisions included</div>
+                    </div>
+                </div>
+
+                <div class="stat-item-premium">
+                    <div class="stat-icon-premium">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-text-premium">
+                        <div class="stat-label-premium">Orders Completed</div>
+                        <div class="stat-value-premium">{{ gig.orders_count }} orders</div>
+                    </div>
+                </div>
+
+                <div class="stat-item-premium">
+                    <div class="stat-icon-premium">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="stat-text-premium">
+                        <div class="stat-label-premium">Total Views</div>
+                        <div class="stat-value-premium">{{ gig.views }} views</div>
+                    </div>
+                </div>
+
+                <!-- Order Button -->
+                {% if user.is_authenticated and user != gig.freelancer %}
+                <form method="POST" action="{% url 'orders:create_order' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="gig_id" value="{{ gig.id }}">
+                    <button type="submit" class="btn-order-premium animate-pulse-glow">
+                        <i class="fas fa-shopping-cart mr-2"></i> Continue to Order
+                    </button>
+                </form>
+                {% elif not user.is_authenticated %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="btn-order-premium">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Login to Order
+                </a>
+                {% elif user == gig.freelancer %}
+                <button disabled class="btn-order-premium" style="background: #94a3b8; cursor: not-allowed;">
+                    <i class="fas fa-ban mr-2"></i> You cannot order your own gig
+                </button>
+                {% endif %}
+
+                <!-- Chat Button -->
+                {% if user.is_authenticated and user != gig.freelancer %}
+                <a href="{% url 'chat:start_chat' gig.freelancer.id %}" class="btn-chat-premium">
+                    <i class="fas fa-comment-dots mr-2"></i> Ask a Question
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Gigs Section -->
+    {% if related_gigs %}
+    <div class="mt-16">
+        <h2 class="section-title-premium text-2xl">You May Also Like</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+            {% for related in related_gigs %}
+            <div class="related-card">
+                <a href="{% url 'gigs:gig_detail' related.slug %}">
+                    <div class="related-image">
+                        {% if related.featured_image %}
+                        <img src="{{ related.featured_image.url }}" alt="{{ related.title }}" loading="lazy">
+                        {% else %}
+                        <div class="w-full h-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                            <i class="fas fa-image text-4xl text-indigo-300"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                </a>
+                <div class="p-4">
+                    <a href="{% url 'gigs:gig_detail' related.slug %}" class="related-title">
+                        {{ related.title|truncatechars:55 }}
+                    </a>
+                    <div class="flex items-center gap-2 mt-2">
+                        <div class="stars-premium text-xs">
+                            {% with rating=related.rating|floatformat:"0"|add:"0" %}
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}
+                            {% endfor %}
+                            {% endwith %}
+                        </div>
+                        <span class="text-xs text-gray-500">({{ related.total_reviews }})</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-lg font-bold text-primary">${{ related.price|floatformat:2 }}</span>
+                        <span class="text-xs text-gray-400"><i class="fas fa-clock mr-1"></i>{{ related.delivery_days }}d</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function toggleSaveGig(gigId) {
+    fetch(`/gigs/save/${gigId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const icon = document.querySelector('.save-btn-premium i');
+        if (data.saved) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            showToast('Gig saved to favorites! ❤️');
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            showToast('Gig removed from favorites 💔');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function showToast(message) {
+    let toast = document.querySelector('.toast-premium');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast-premium';
+        toast.style.cssText = 'position:fixed;bottom:30px;right:30px;background:#1e293b;color:white;padding:12px 24px;border-radius:50px;z-index:9999;transform:translateX(400px);transition:transform 0.3s ease;box-shadow:0 10px 25px rgba(0,0,0,0.2);font-family:system-ui;';
+        document.body.appendChild(toast);
+    }
+    toast.innerHTML = `<i class="fas fa-heart text-red-400 mr-2"></i> ${message}`;
+    toast.style.transform = 'translateX(0)';
+    setTimeout(() => {
+        toast.style.transform = 'translateX(400px)';
+    }, 3000);
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

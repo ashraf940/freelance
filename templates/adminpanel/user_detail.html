@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Details - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+    .back-link { margin-bottom: 20px; display: inline-block; color: #3b82f6; text-decoration: none; }
+    .profile-card { background: white; border-radius: 20px; border: 1px solid #e5e7eb; padding: 25px; margin-bottom: 25px; }
+    .profile-header { display: flex; gap: 20px; align-items: center; margin-bottom: 25px; flex-wrap: wrap; }
+    .avatar { width: 80px; height: 80px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: white; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .stat-box { background: #f9fafb; padding: 15px; border-radius: 12px; text-align: center; }
+    .stat-box h3 { font-size: 24px; font-weight: 700; color: #1f2937; }
+    .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
+    .btn { padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb; }
+    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .info-item { padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
+    .info-label { font-weight: 600; color: #6b7280; width: 150px; display: inline-block; }
+</style>
+
+<div class="admin-container">
+    <a href="{% url 'adminpanel:users' %}" class="back-link">← Back to Users</a>
+
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="avatar">{{ profile_user.email|first|upper }}</div>
+            <div><h2>{{ profile_user.get_full_name|default:profile_user.username }}</h2><p>{{ profile_user.email }}</p></div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-box"><h3>{{ gigs_count }}</h3><p>Gigs</p></div>
+            <div class="stat-box"><h3>{{ orders_as_buyer }}</h3><p>Orders (Buyer)</p></div>
+            <div class="stat-box"><h3>{{ orders_as_seller }}</h3><p>Orders (Seller)</p></div>
+            <div class="stat-box"><h3>${{ total_spent|floatformat:0 }}</h3><p>Total Spent</p></div>
+            <div class="stat-box"><h3>${{ total_earned|floatformat:0 }}</h3><p>Total Earned</p></div>
+        </div>
+
+        <div class="action-buttons">
+            {% if profile_user.is_suspended %}
+            <a href="{% url 'adminpanel:user_suspend' profile_user.id %}" class="btn btn-success" onclick="return confirm('Activate this user?')">Activate User</a>
+            {% else %}
+            <a href="{% url 'adminpanel:user_suspend' profile_user.id %}" class="btn btn-danger" onclick="return confirm('Suspend this user?')">Suspend User</a>
+            {% endif %}
+            {% if not profile_user.email_verified %}
+            <a href="{% url 'adminpanel:user_verify' profile_user.id %}" class="btn btn-success" onclick="return confirm('Verify this user?')">Verify User</a>
+            {% endif %}
+        </div>
+
+        <div class="section-title">User Information</div>
+        <div class="info-grid">
+            <div class="info-item"><span class="info-label">Username:</span> {{ profile_user.username }}</div>
+            <div class="info-item"><span class="info-label">Role:</span> {{ profile_user.role|title }}</div>
+            <div class="info-item"><span class="info-label">Email Verified:</span> {{ profile_user.email_verified|yesno:"Yes,No" }}</div>
+            <div class="info-item"><span class="info-label">Identity Verified:</span> {{ profile_user.identity_verified|yesno:"Yes,No" }}</div>
+            <div class="info-item"><span class="info-label">Joined:</span> {{ profile_user.date_joined|date:"M d, Y" }}</div>
+            <div class="info-item"><span class="info-label">Last Login:</span> {{ profile_user.last_login|date:"M d, Y"|default:"Never" }}</div>
+            <div class="info-item"><span class="info-label">Bio:</span> {{ profile_user.bio|default:"No bio" }}</div>
+            <div class="info-item"><span class="info-label">Country:</span> {{ profile_user.country.name|default:"Not set" }}</div>
+        </div>
+    </div>
+
+    {% if user_gigs %}
+    <div class="profile-card">
+        <div class="section-title">Recent Gigs</div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead><tr><th>Title</th><th>Price</th><th>Status</th><th>Created</th></tr></thead>
+            <tbody>
+                {% for gig in user_gigs %}
+                <tr><td>{{ gig.title|truncatechars:50 }}</td><td>${{ gig.price|floatformat:2 }}</td><td>{{ gig.status|title }}</td><td>{{ gig.created_at|date:"M d, Y" }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

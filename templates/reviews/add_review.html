@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Review - Freelance Platform{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="container mx-auto px-4 max-w-2xl">
+        <div class="bg-white rounded-lg shadow border border-gray-200 p-8">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Rate Your Experience</h1>
+            <p class="text-gray-600 mb-6">Order #{{ order.order_number }}</p>
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Your Rating</label>
+                    <div class="flex gap-2" id="ratingStars">
+                        {% for i in "54321"|make_list %}
+                        <button type="button" data-rating="{{ i }}" class="rating-star text-4xl text-gray-300 hover:text-yellow-400 transition">
+                            ☆
+                        </button>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="rating" id="ratingValue" required>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Review (Optional)</label>
+                    <textarea name="comment" rows="5" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500" 
+                              placeholder="Share your experience with this freelancer..."></textarea>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                        Submit Review
+                    </button>
+                    <a href="{% url 'orders:order_detail' order.id %}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const stars = document.querySelectorAll('.rating-star');
+    const ratingInput = document.getElementById('ratingValue');
+    
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = this.dataset.rating;
+            ratingInput.value = rating;
+            
+            stars.forEach((s, index) => {
+                if (index >= 5 - rating) {
+                    s.innerHTML = '★';
+                    s.classList.add('text-yellow-400');
+                    s.classList.remove('text-gray-300');
+                } else {
+                    s.innerHTML = '☆';
+                    s.classList.add('text-gray-300');
+                    s.classList.remove('text-yellow-400');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

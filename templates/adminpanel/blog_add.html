@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Blog Post - Admin{% endblock %}
+
+{% block content %}
+<style>
+    .blog-form-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .form-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #e5e7eb;
+        padding: 30px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #374151;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+    }
+    .form-group textarea {
+        min-height: 100px;
+    }
+    .btn-submit {
+        background: #10b981;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+    .btn-back {
+        background: #6b7280;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 10px;
+        text-decoration: none;
+        margin-left: 10px;
+    }
+</style>
+
+<div class="blog-form-container">
+    <div class="form-card">
+        <h1>✏️ Edit Blog Post</h1>
+        <hr style="margin: 20px 0;">
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Title *</label>
+                <input type="text" name="title" value="{{ post.title }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Category *</label>
+                <select name="category" required>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if post.category.id == cat.id %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Abstract</label>
+                <textarea name="abstract">{{ post.abstract }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Introduction</label>
+                <textarea name="introduction">{{ post.introduction|default:"" }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Keywords</label>
+                <input type="text" name="keywords" value="{{ post.keywords }}">
+            </div>
+
+            <div style="display: flex;">
+                <button type="submit" class="btn-submit">💾 Save Changes</button>
+                <a href="/admin-panel/blog-posts/" class="btn-back">← Back</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

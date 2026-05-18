@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Gigs - Freelance Platform{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="container mx-auto px-4">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">My Gigs</h1>
+                <p class="text-gray-600 mt-1">Manage your freelance services</p>
+            </div>
+            <a href="{% url 'gigs:create_gig' %}" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+                <i class="fas fa-plus mr-2"></i> Create New Gig
+            </a>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl border border-gray-200 p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Gigs</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.total }}</p>
+                    </div>
+                    <i class="fas fa-briefcase text-3xl text-blue-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Active Gigs</p>
+                        <p class="text-2xl font-bold text-green-600">{{ stats.active }}</p>
+                    </div>
+                    <i class="fas fa-check-circle text-3xl text-green-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Pending Approval</p>
+                        <p class="text-2xl font-bold text-yellow-600">{{ stats.pending }}</p>
+                    </div>
+                    <i class="fas fa-clock text-3xl text-yellow-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Orders</p>
+                        <p class="text-2xl font-bold text-purple-600">{{ stats.total_orders }}</p>
+                    </div>
+                    <i class="fas fa-shopping-cart text-3xl text-purple-500"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gigs List -->
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gig</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Orders</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for gig in gigs %}
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    {% if gig.featured_image %}
+                                    <img src="{{ gig.featured_image.url }}" alt="{{ gig.title }}" class="w-12 h-12 rounded object-cover">
+                                    {% else %}
+                                    <div class="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                                        <i class="fas fa-image text-gray-400"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div class="ml-3">
+                                        <a href="{% url 'gigs:gig_detail' gig.slug %}" class="font-medium text-gray-900 hover:text-blue-600">
+                                            {{ gig.title|truncatechars:40 }}
+                                        </a>
+                                        <div class="flex items-center mt-1">
+                                            <div class="flex text-yellow-400 text-xs">
+                                                {% with rating=gig.rating|floatformat:"0"|add:"0" %}
+                                                {% for i in "12345"|make_list %}
+                                                    {% if forloop.counter <= rating %}
+                                                        <i class="fas fa-star"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% endwith %}
+                                            </div>
+                                            <span class="text-xs text-gray-500 ml-2">({{ gig.total_reviews }})</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600">{{ gig.category.name }}</td>
+                            <td class="px-6 py-4 font-semibold text-blue-600">${{ gig.price|floatformat:2 }}</td>
+                            <td class="px-6 py-4 text-gray-600">{{ gig.orders_count }}</td>
+                            <td class="px-6 py-4">
+                                {% if gig.status == 'active' %}
+                                <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Active</span>
+                                {% elif gig.status == 'pending' %}
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">Pending</span>
+                                {% elif gig.status == 'paused' %}
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">Paused</span>
+                                {% else %}
+                                <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">{{ gig.status|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex gap-2">
+                                    <a href="{% url 'gigs:edit_gig' gig.id %}" class="text-blue-600 hover:text-blue-800" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'gigs:gig_analytics' gig.id %}" class="text-green-600 hover:text-green-800" title="Analytics">
+                                        <i class="fas fa-chart-line"></i>
+                                    </a>
+                                    <button onclick="toggleStatus('{{ gig.id }}')" class="text-yellow-600 hover:text-yellow-800" title="Toggle Status">
+                                        <i class="fas fa-pause-circle"></i>
+                                    </button>
+                                    <button onclick="deleteGig('{{ gig.id }}')" class="text-red-600 hover:text-red-800" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                                <i class="fas fa-briefcase text-4xl mb-3 block"></i>
+                                <p>You haven't created any gigs yet.</p>
+                                <a href="{% url 'gigs:create_gig' %}" class="inline-block mt-3 text-blue-600 hover:underline">Create your first gig</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleStatus(gigId) {
+    if(confirm('Toggle gig status? Active ↔ Paused')) {
+        fetch(`/gigs/${gigId}/toggle/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            }
+        }).then(() => location.reload());
+    }
+}
+
+function deleteGig(gigId) {
+    if(confirm('Are you sure? This action cannot be undone.')) {
+        fetch(`/gigs/${gigId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            }
+        }).then(() => location.reload());
+    }
+}
+
+function getCookie(name) {
+    let value = "; " + document.cookie;
+    let parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+}
+</script>
+{% endblock %}
